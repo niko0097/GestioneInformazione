@@ -15,7 +15,7 @@ class DBLPHandler(xml.sax.ContentHandler):
 		self.key = ''
 		self.crossref = ''
 		self.url = ''
-		self.__AllData = []
+		self.__AllData = []	#IN QUESTO OGGETTO FINISCONO TUTTI I TIPI DI OGGETTO, OGNIUNO CON LA SUA FUNZIONE "put_to_db" CHE INSERISCE NELLA TABELLA GIUSTA I SUOI VALORI
 
 	'''Chiamato quando viene letto un nuovo oggetto.'''
 	def startElement(self, tag, attr):
