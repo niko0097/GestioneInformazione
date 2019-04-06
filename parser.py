@@ -15,9 +15,7 @@ class DBLPHandler(xml.sax.ContentHandler):
 		self.key = ''
 		self.crossref = ''
 		self.url = ''
-		self.book_list = []
-		self.inproceedings = []
-		self.phthesis = []
+		self.__AllData = []
 
 	'''Chiamato quando viene letto un nuovo oggetto.'''
 	def startElement(self, tag, attr):
