@@ -1,6 +1,6 @@
 from obj import *
 
-class inproceedings(obj):
+class article(obj):
 	def __init__(self):
 		obj.__init__(self)
-		self.tipo = 'inproceedings'
+		self.tipo = "articles"
