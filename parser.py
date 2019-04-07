@@ -10,14 +10,7 @@ class DBLPHandler(xml.sax.ContentHandler):
 
 	def __init__(self):
 		self.CurrentData = ''
-		self.title = ''
-		self.author = ''
-		self.year = ''
-		self.publisher = ''
-		self.key = ''
-		self.crossref = ''
-		self.url = ''
-		self.ee = ''
+		self.ee = ""
 
 	'''Chiamato quando viene letto un nuovo oggetto.'''
 	def startElement(self, tag, attr):
@@ -57,39 +50,33 @@ class DBLPHandler(xml.sax.ContentHandler):
 		global x
 
 		if self.CurrentData == "author":
-			x.author.append(self.author)
-			#print(x.author)
-			#print ("Author:", self.author)
+			x.author.append(self.author.replace("'", " "))
 
 		if self.CurrentData == "title":
-			x.title = self.title
-			#print ("Title:", self.title)
+			x.title = self.title.replace("'", " ")
 
 		if self.CurrentData == "year":
 			x.year = self.year
-			#print ("Year:", self.year)
 
 		if self.CurrentData == "publisher":
 			x.publisher.append(self.publisher)
-			#print ("Publisher:", self.publisher)
 
 		if self.CurrentData == "crossref":
 			x.crossref = self.crossref
-			#print ("Crossref:", self.crossref)
 
 		if self.CurrentData == "ee":
 			x.ee.append(self.ee)
 
 		if self.CurrentData == "url":
 			x.url = self.url
-			#print ("Url:", self.url)
 
 		if tag == 'article':			##SE INCONTRA IL TAG ARTICLE, VUOL DIRE CHE L ARTICOLO E' FINITO E COMPLETO,POSSIAMO QUINDI INSERIRLO NEL DATABASE
 			global conn
+			global query_executor
 			counter += 1
 			percentuale = counter / tot * 100
 			print("{} %".format(percentuale))
-			x.put_on_db(conn)
+			x.put_on_db(query_executor)
 
 		self.CurrentData = ""
 
@@ -119,25 +106,8 @@ class DBLPHandler(xml.sax.ContentHandler):
 counter = 0
 tot = 4552674
 x = obj()
-conn = sqlite3.connect("progetto.db")
-cursor = conn.cursor()
-sql = """CREATE TABLE IF NOT EXISTS `articles` (
-	`mdate`	TEXT NOT NULL,
-	`key`	TEXT NOT NULL UNIQUE,
-	`authors`	TEXT,
-	`editors`	TEXT,
-	`title`	TEXT,
-	`pages`	TEXT,
-	`year`	TEXT,
-	`volume`	TEXT,
-	`journal`	TEXT,
-	`number`	TEXT,
-	`ees`	TEXT,
-	`url`	TEXT,
-	`crossref`	TEXT
-);"""
-cursor.execute(sql)
-conn.commit()
+query_executor = query_executor()
+query_executor.create_table_query()
 
 # create an XMLReader
 parser = xml.sax.make_parser()

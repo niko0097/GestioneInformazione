@@ -1,4 +1,4 @@
-import sqlite3
+from query_executor import *
 
 class obj():
 	def __init__(self):
@@ -21,16 +21,15 @@ class obj():
 		self.publisher = []			#12
 		self.publishers = ""			#QUESTO VA NEL DATABASE
 
-	def put_on_db(self,conn):
+	def put_on_db(self,query_executor):
 		self.authors = ''.join(self.author)
 		self.ees = ''.join(self.ee)
 		self.publishers = ''.join(self.publisher)
 
+		self.authors = self.authors.replace("'"," ")
+		self.publishers = self.publishers.replace("'", " ")
+
 		#print(self.author)
 		self.query = """INSERT INTO {} VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}');""".format(self.tipo,  self.mdate,  self.key,  self.authors,  self.editors,  self.title,  self.pages,  self.year,  self.volume,  self.journal,  self.number,  self.ees,  self.url,  self.crossref)
-		print(self.query)
-
-		cursorObject = conn.cursor()
-		cursorObject.execute(self.query)
-		print("QUERY COMPIUTA")
-		conn.commit()
+		#print(self.query)
+		query_executor.execute_query(self.query)
