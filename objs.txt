@@ -1,0 +1,42 @@
+OBJS:
+	-articles:
+		key
+		mdate
+		author []
+		title
+		pages
+		year
+		volume
+		journal
+		number
+		ee []
+		url
+	-phthesis:
+	-proceedings:
+		key
+		mdate
+		title
+		editor[]
+		booktitle
+		publisher
+		series
+		volume
+		year
+		isbn
+		ee	[]
+		url
+	-inproceedings:
+		key
+		mdate
+		author []
+		title
+		pages
+		year
+		booktitle
+		ee []
+		crossref
+		url
+	-book:
+	-incollection
+	-mastersthesis
+	-www
