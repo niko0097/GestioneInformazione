@@ -1,39 +1,64 @@
-from .book import book
+class proceedings():
+	def __init__(self):
+		self.tipo = "proceedings"
+		self.key = ""					#1
+		self.mdate = ""					#2
+		self.title = ""					#3
+		self.editor = []				#4
+		self.booktitle = ""				#5
+		self.publisher = ""				#6
+		self.series = ""				#7
+		self.volume = ""				#8
+		self.year = ""					#9
+		self.isbn = ""					#10
+		self.ee = []					#11
+		self.url = ""					#12
+		self.authors = []				#13
+		self.pages = []
 
-class proceedings(book):
-    def __init__(self):
-        super().__init__(self)
-        self.fields = ['title','pages','year','volume','publisher','isbn','url','series','crossref']
-        self.tipo = 'proceedings'
-        
-        self.editor = []
-        self.editors = ''
+		##stringhe temporanee da buttare nel database
+		self.query = ""
+		self.ees = ""
+		self.editors = ""
+		self.autori = ""
 
-    def put_on_db(self):
-        for i in self.author:
-            self.authors = self.authors+ ", " + self.author[i]
+	def put_on_db(self):
+		self.autori = ' '.join(self.authors)
+		self.ees = ' '.join(self.ee)
+		self.editors = ' '.join(self.editor)
 
-        for i in self.ee:
-            self.ees = self.ees + ", " +  self.ee[i]
+		self.autori = self.autori.replace("'", " ")
+		self.editors = self.editors.replace("'"," ")
+		self.ees = self.ees.replace("'", ' ')
+		self.title = self.title.replace("'", " ")
+		self.publisher = self.publisher.replace("'", " ")
+		self.booktitle = self.booktitle.replace("'", " ")
 
-        for i in self.editor:
-            self.editors = self.editors + ", " + self.editor[i]
+		self.query = "INSERT INTO {} VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');".format(self.tipo, self.key, self.mdate, self.autori , self.pages ,self.title, self.editors, self.booktitle, self.publisher, self.series, self.volume, self.year, self.isbn, self.ees, self.url)
+		#print(self.query)
+		return self.query
 
-        self.query = "INSERT INTO {} VALUES ({},{},{},{},{},{},{},{},{},{},{},{},{},{});".format(
-                                        self.tipo,
-                                        self.mdate,
-                                        self.key,
-                                        self.authors,
-                                        self.editors,
-                                        self.title,
-                                        self.pages,
-                                        self.year,
-                                        self.volume,
-                                        self.publisher,
-                                        self.isbn,
-                                        self.ees,
-                                        self.url,
-                                        self.series,
-                                        self.crossref)
-        print(self.query)
-        return self.query
+	def table(self):
+		global sql_for_tables
+		return sql_for_tables
+
+sql_for_tables = """
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS `proceedings` (
+	`key`	TEXT NOT NULL,
+	`mdate`	TEXT NOT NULL,
+	`authors`	TEXT,
+	`pages`	TEXT,
+	`title`	TEXT,
+	`editors`	TEXT,
+	`booktitle`	TEXT,
+	`publisher`	TEXT,
+	`series`	TEXT,
+	`volume`	TEXT,
+	`year`	TEXT,
+	`isbn`	TEXT,
+	`ee`	TEXT,
+	`url`	TEXT
+
+);
+COMMIT; """
