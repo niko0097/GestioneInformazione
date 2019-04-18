@@ -5,7 +5,7 @@ SCRIPT PER L'INDICIZZAZIONE DEL DB.
 
 import psycopg2
 
-class indexer():
+class indexer:
     def __init__(self):
         self.tables = ['articles','book','incollection','inproceedings','mastersthesis','phdthesis','proceedings','www']
         self.db = 'GAvI'
@@ -22,7 +22,7 @@ class indexer():
         print("Connection established.")
 
         for tab in self.tables:
-            query = "ALTER TABLE {} ADD COLUMN ts_elements tsvector;".format(tab)
+            query = """ALTER TABLE {} ADD COLUMN ts_elements tsvector;""".format(tab)
             try:
                 print("Modifing {} table...".format(tab))
                 cur.execute(query)
@@ -34,25 +34,29 @@ class indexer():
                 return
 
             if tab in ['articles','inproceedings','mastersthesis','phdthesis','proceedings']:
-                query = "UPDATE {} SET ts_elements = to_tsvector(title|| ' ' ||authors|| ' ' ||year);".format(tab)
-            elif tab in ['book','incollection','www']:
-                query = "UPDATE {} SET ts_elements = to_tsvector(editors|| ' ' ||authors);".format(tab)
+                query = """UPDATE {} SET ts_elements = to_tsvector(title|| ' ' ||authors|| ' ' ||year);""".format(tab)
+            elif tab in ['book','incollection']:
+                query = """UPDATE {} SET ts_elements = to_tsvector(editor|| ' ' ||authors);""".format(tab)
+            elif tab  == 'www':
+                query = """UPDATE {} SET ts_elements = to_tsvector(editors|| ' ' ||authors);""".format(tab)
 
             try:
                 print("Setting {} table with tsvectors...".format(tab))
                 cur.execute(query)
                 conn.commit()
+                print("Done.")
             except Exception as e:
                 print(e)
                 cur.close()
                 conn.close()
                 return
 
-            query = "CREATE INDEX {}_idx ON {} USING GIN(ts_elements);".format(tab,tab)
+            query = """CREATE INDEX {}_idx ON {} USING GIN(ts_elements);""".format(tab,tab)
             try:
                 print("Creating index on {}...".format(tab))
                 cur.execute(query)
                 conn.commit()
+                print("Index created.")
             except Exception as e:
                 print(e)
                 cur.close()
@@ -70,7 +74,7 @@ class indexer():
         print("Connection established.")
 
         for tab in self.tables:
-            query = "DROP INDEX IF EXISTS {}_idx;".format(tab)
+            query = """DROP INDEX IF EXISTS {}_idx;""".format(tab)
             try:
                 print("Dropping index on {}...".format(tab))
                 cur.execute(query)
@@ -81,7 +85,7 @@ class indexer():
                 conn.close()
                 return
 
-            query = "ALTER TABLE {} REMOVE COLUMN ts_elements;".format(tab)
+            query = """ALTER TABLE {} DROP COLUMN ts_elements;""".format(tab)
             try:
                 print("Deleting ts_elements on {}...".format(tab))
                 cur.execute(query)
