@@ -3,6 +3,9 @@ class incollection():
 		self.tipo = "incollection"
 		self.key = ""			#1
 		self.mdate = ""			#2
+		self.title = ""
+		self.publisher = ''
+		self.year = ''
 		self.editor = []		#3
 		self.isbn = ""			#4
 		self.authors = []		#5
@@ -27,7 +30,7 @@ class incollection():
 		self.title = self.title.replace("'", " ")
 		'''
 
-		self.query = """INSERT INTO {} VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}','{}');""".format(self.tipo, self.key, self.mdate, self.editors, self.isbn, self.autori, self.pages, self.ees,self.crossref)
+		self.query = """INSERT INTO {} VALUES('{}','{}','{}','{}', '{}', '{}', '{}', '{}', '{}', '{}','{}');""".format(self.tipo, self.key, self.mdate, self.title, self.publisher, self.year, self.editors, self.isbn, self.autori, self.pages, self.ees,self.crossref)
 		return self.query
 
 	def table(self):
@@ -39,6 +42,9 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS incollection (
 	key	TEXT NOT NULL UNIQUE,
 	mdate	TEXT NOT NULL,
+	title TEXT,
+	publisher TEXT,
+	year TEXT,
 	editor	TEXT,
 	isbn	TEXT,
 	authors	TEXT,

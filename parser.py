@@ -8,7 +8,6 @@ from book import *
 from incollection import *
 from mastersthesis import *
 from phdthesis import *
-from www import *
 import psycopg2
 import sys
 from time import time
@@ -82,10 +81,10 @@ class DBLPHandler(xml.sax.ContentHandler):
 			x.mdate = attr['mdate']
 			#print("mastersthesis")
 
-		elif tag == 'www':
-			x = www()
-			x.key = attr['key']
-			x.mdate = attr['mdate']
+		#elif tag == 'www':
+		#	x = www()
+		#	x.key = attr['key']
+		#	x.mdate = attr['mdate']
 
 		elif tag == 'phdthesis':
 			x = phdthesis()
@@ -178,7 +177,7 @@ class DBLPHandler(xml.sax.ContentHandler):
 		elif tag == "":
 			self.space_counter += 1
 
-		elif tag in ['article','book','inproceedings','proceedings', 'incollection', 'mastersthesis','phdthesis','www']:								#CHIAMA UNA VOLTA E BASTA LA FUNZIONE DI X CHE BUTTA IL CONTENUTO SUL DATABASE(FUNZIONA QUINDI VA BENE)
+		elif tag in ['article','book','inproceedings','proceedings', 'incollection', 'mastersthesis','phdthesis']:								#CHIAMA UNA VOLTA E BASTA LA FUNZIONE DI X CHE BUTTA IL CONTENUTO SUL DATABASE(FUNZIONA QUINDI VA BENE)
 			global current
 			query = x.put_on_db()
 			#print(query)
@@ -305,8 +304,8 @@ if __name__ == '__main__':
 		x = phdthesis()
 		c.execute(x.table())
 
-		x = www()
-		c.execute(x.table())
+		#x = www()
+		#c.execute(x.table())
 
 		##########################
 		##########################
