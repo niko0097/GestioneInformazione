@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-'''
-SCRIPT PER L'INDICIZZAZIONE DEL DB.
-'''
+
 
 import psycopg2
 
+
+# Classe per l'indicizzazione di ogni tabella del db.
+# Si presuppone che il database sia locale, che si chiami 'GAvI', lo user che vi accede sia 'niko' e la sua pw sia 'nana'.
+# Questa classe si occupa di indicizzare ogni tabella sui campi 'title', 'author', e 'year', per supportare la ricerca
+# su uno di questi 3 campi singolarmente, o su tutti e 3 assieme.
+# A seconda della tabella, è poi necessario indicizzare un altro campo (publisher o journal) per velocizzare le ricerche
+# della venue
 class indexer:
     def __init__(self):
         self.tables = ['articles','book','incollection','inproceedings','mastersthesis','phdthesis','proceedings']
@@ -15,12 +20,15 @@ class indexer:
 
         self.conn = ''
 
+    # Funzione per la creazione dell'indice su ogni tabella
     def createColIndex(self):
+        # Connessione con db
         print("Starting connection...")
         conn = psycopg2.connect(host=self.host, database=self.db, user=self.user, password=self.pw)
         cur = conn.cursor()
         print("Connection established.")
 
+        # Su ogni tabella viene creata una colonna per ogni campo di ricerca. I dati all'interno sono tsvector
         for tab in self.tables:
             query = """
                     ALTER TABLE {} ADD COLUMN ts_title tsvector;
@@ -58,6 +66,7 @@ class indexer:
                 conn.close()
                 return
 
+            # Creazione effettiva dell'indice
             if tab in ['mastersthesis','phdthesis','inproceedings']:
                 query = """CREATE INDEX {}_idx ON {} USING GIN(ts_title,ts_authors,ts_year);""".format(tab,tab)
             elif tab == 'articles':
@@ -80,6 +89,7 @@ class indexer:
         cur.close()
         conn.close()
 
+    # Funzione per l'eleiminazione dell'indice. Usare solo se assolutamente necessario.
     def deleteIdx(self):
         print("Starting connection...")
         conn = psycopg2.connect(host=self.host, database=self.db, user=self.user, password=self.pw)
@@ -99,10 +109,10 @@ class indexer:
                 return
 
             query = """
-                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_title;
-                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_authors;
-                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_year;
-                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_journal;
+                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_title
+                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_authors
+                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_year
+                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_journal
                     ALTER TABLE {} DROP COLUMN IF EXISTS ts_publisher;
                     """.format(tab,tab,tab,tab,tab)
             try:
@@ -118,7 +128,9 @@ class indexer:
         conn.close()
 
 
+
+# Script per la creazione dell'indice da terminale. Se si lancia questo script si presuppone che si voglia creare
+# l'indice E BASTA
 if __name__ == '__main__':
-    #se lo lancio da python suppongo di voler solo creare un indice
     ind = indexer()
     ind.createColIndex()
