@@ -521,7 +521,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Creazione search search_engine
-    main(args.frase,
+    SE = searchEng(args.frase,
                         args.tabella,
                         year=args.year,
                         text_field=args.text_field,
