@@ -80,24 +80,29 @@ class UserInterface:
         self.printView(records)
 
     def printView(self,records):
-        self.tree = ttk.Treeview(self.window, columns=('Authors', 'Year', 'URL'))
+        self.tree = ttk.Treeview(self.window)
         self.tree.heading('#0', text='Title')
-        self.tree.heading('#1', text='Authors')
-        self.tree.heading('#2', text='Year')
-        self.tree.heading('#3', text='URL')
-        self.tree.column('#0', stretch=YES, width=900)
-        self.tree.column('#1', stretch=YES, width=400)
-        self.tree.column('#2', stretch=YES, width=60)
-        self.tree.column('#3', stretch=YES, width=250)
-        self.tree.grid()
+        self.tree.column('#0', stretch=YES, width=1500)
+        self.scrollbar = Scrollbar(self.window, orient='vertical', command=self.tree.yview)
+        self.tree.configure(yscrollcommand=self.scrollbar.set)
 
+        self.i = 0
         for rec in records:
-            self.tree.insert('', 'end', text=rec['title'], values=(rec['authors'],rec['year'],rec['url']))
+            self.tree.insert('', 'end', iid=self.i, text=rec['title'])
+            self.tree.insert(self.i, 'end', text="Authors: " + rec['authors'])
+            self.tree.insert(self.i, 'end', text="Year: " + rec['year'])
+            self.tree.insert(self.i, 'end', text="URL: " + rec['url'])
+            self.tree.item(self.i, open=True)
             # for key,val in rec.items():
             #     print(str(key) + " --> " + str(val))
             # print(json.dumps(ast.literal_eval(str(rec)), indent=4))
+            self.i += 1
 
+        self.tree.config(height=50)
+        self.tree.grid(row=0, column=0, sticky=N+S)
+        self.scrollbar.grid(row=0, column=1, sticky=N+S)
 
+# CLEAR THE WHOLE WINDOW IN ORDER TO REUSE IT
     def clearAll(self):
         self.phrase_entry.grid_forget()
         self.table_entry.grid_forget()
