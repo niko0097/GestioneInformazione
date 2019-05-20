@@ -91,11 +91,12 @@ class UserInterface:
             self.tree.insert('', 'end', iid=self.i, text=rec['title'])
             self.tree.insert(self.i, 'end', text="Authors: " + rec['authors'])
             self.tree.insert(self.i, 'end', text="Year: " + rec['year'])
-            self.tree.insert(self.i, 'end', text="URL: " + rec['url'])
+            # self.tree.insert(self.i, 'end', text="URL: " + rec['url'])
             self.tree.item(self.i, open=True)
             # for key,val in rec.items():
             #     print(str(key) + " --> " + str(val))
-            # print(json.dumps(ast.literal_eval(str(rec)), indent=4))
+            if( not ('url' in rec.keys()) ):
+                print(json.dumps(ast.literal_eval(str(rec)), indent=4))
             self.i += 1
 
         self.tree.config(height=50)
