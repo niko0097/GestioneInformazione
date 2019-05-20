@@ -1,27 +1,34 @@
 #!/usr/bin/env python3
+import ast
+import json
 from tkinter import *
 from tkinter import ttk
+
 from search_engine import *
-import sys
-import json
-import ast
+
 
 class UserInterface:
     # INITIALIZE ALL THE COMPONENTS FOR EVERY VIEW
-    def __init__(self,window):
+    def __init__(self, window):
         self.window = window
+        self.notebook = ttk.Notebook(self.window)
+        self.tree_frame = Frame(self.notebook)
+        self.json_frame = Frame(self.notebook)
+        self.tree = ttk.Treeview(self.tree_frame)
+        self.scrollbar = Scrollbar(self.tree_frame, orient='vertical', command=self.tree.yview)
+        self.json_text = Text(self.json_frame, height=55, width=200)
         self.phrase_entry = Entry(self.window, width=22)
         self.table_entry = Entry(self.window, width=22)
         self.year_entry = Entry(self.window, width=22)
-        self.text_field_cbb = ttk.Combobox(self.window, values=['authors','year','title'])
+        self.text_field_cbb = ttk.Combobox(self.window, values=['authors', 'year', 'title'])
         self.venue_entry = Entry(self.window, width=22)
-        self.venue_field_cbb = ttk.Combobox(self.window, values=['title','publisher','journal'])
+        self.venue_field_cbb = ttk.Combobox(self.window, values=['title', 'publisher', 'journal'])
         self.number_scale = Scale(from_=0, to=200, resolution=10, orient=HORIZONTAL, length=200)
-        self.ranking_cbb = ttk.Combobox(self.window, values=['boolean','bm25','BM25'])
+        self.ranking_cbb = ttk.Combobox(self.window, values=['boolean', 'bm25', 'BM25'])
         self.required_label = Label(self.window, text="Required Fields", font="none 18 bold")
         self.phrase_label = Label(self.window, text="Phrase")
         self.table_label = Label(self.window, text="Table")
-        self.optional_lable = Label(self.window, text="Optional Fields", font="none 18")
+        self.optional_label = Label(self.window, text="Optional Fields", font="none 18")
         self.year_table = Label(self.window, text="Year")
         self.text_field_label = Label(self.window, text="Text Field")
         self.venue_label = Label(self.window, text="Venue")
@@ -34,77 +41,79 @@ class UserInterface:
     def launch_query(self):
         phrase = self.phrase_entry.get()
         table = self.table_entry.get()
-# add more controls on input type (table)
-        if(not phrase or not table):
+        # add more controls on input type (table)
+        if not phrase or not table:
             print('Error')
             return
 
         year = self.year_entry.get()
-# if not int?
-        if(year):
+        # if not int?
+        if year:
             year = int(year)
         else:
             year = None
         text_field = self.text_field_cbb.get()
-        if (text_field == ""):
+        if text_field == "":
             text_field = None
         venue = self.venue_entry.get()
-        if (venue == ""):
+        if venue == "":
             venue = None
         venue_field = self.venue_field_cbb.get()
-        if (venue_field == ""):
+        if venue_field == "":
             venue_field = None
         ranking = self.ranking_cbb.get()
-        if (ranking == ""):
+        if ranking == "":
             ranking = None
-# set 0 = all results
+        # set 0 = all results
         number = self.number_scale.get()
 
-        print("\n\nNext Query includes the following parameters:\n"\
-            "\nPhrase: " + phrase + "\nTable: " + table + "\nYear: " + str(year) + \
-            "\nText Field: " + str(text_field) + "\nVenue: " + str(venue) + \
-            "\nVenue Field: " + str(venue_field) + "\nNumber: " + str(number) + "\nRanking: " + str(ranking))
+        print("\n\nNext Query includes the following parameters:\n" \
+              "\nPhrase: " + phrase + "\nTable: " + table + "\nYear: " + str(year) + \
+              "\nText Field: " + str(text_field) + "\nVenue: " + str(venue) + \
+              "\nVenue Field: " + str(venue_field) + "\nNumber: " + str(number) + "\nRanking: " + str(ranking))
 
         SE = searchEng(phrase,
-                        table,
-                        year=year,
-                        text_field=text_field,
-                        venue=venue,
-                        venue_field=venue_field,
-                        ranking=ranking,
-                        num=number)
+                       table,
+                       year=year,
+                       text_field=text_field,
+                       venue=venue,
+                       venue_field=venue_field,
+                       ranking=ranking,
+                       num=number)
 
         records = SE.interrogation()
 
-        self.clearAll()
-        self.printView(records)
+        self.clear_all()
+        self.print_view(records)
 
-    def printView(self,records):
-        self.tree = ttk.Treeview(self.window)
+    def print_view(self, records):
+        self.notebook.add(self.tree_frame, text="TreeView")
+        self.notebook.add(self.json_frame, text="JSON")
         self.tree.heading('#0', text='Title')
         self.tree.column('#0', stretch=YES, width=1500)
-        self.scrollbar = Scrollbar(self.window, orient='vertical', command=self.tree.yview)
         self.tree.configure(yscrollcommand=self.scrollbar.set)
 
-        self.i = 0
+        i = 0
         for rec in records:
-            self.tree.insert('', 'end', iid=self.i, text=rec['title'])
-            self.tree.insert(self.i, 'end', text="Authors: " + rec['authors'])
-            self.tree.insert(self.i, 'end', text="Year: " + rec['year'])
-            # self.tree.insert(self.i, 'end', text="URL: " + rec['url'])
-            self.tree.item(self.i, open=True)
-            # for key,val in rec.items():
-            #     print(str(key) + " --> " + str(val))
-            if( not ('url' in rec.keys()) ):
-                print(json.dumps(ast.literal_eval(str(rec)), indent=4))
-            self.i += 1
+            self.tree.insert('', 'end', iid=i, text=rec['title'])
+            self.tree.insert(i, 'end', text="Authors: " + rec['authors'])
+            self.tree.insert(i, 'end', text="Year: " + rec['year'])
+            if 'url' in rec.keys():
+                self.tree.insert(i, 'end', text="URL: " + rec['url'])
+            self.tree.item(i, open=True)
 
-        self.tree.config(height=50)
-        self.tree.grid(row=0, column=0, sticky=N+S)
-        self.scrollbar.grid(row=0, column=1, sticky=N+S)
+            i += 1
 
-# CLEAR THE WHOLE WINDOW IN ORDER TO REUSE IT
-    def clearAll(self):
+        self.json_text.insert('end', json.dumps(ast.literal_eval(str(records)), indent=4))
+
+        self.json_text.grid(row=0, column=0, sticky=NS)
+        self.notebook.grid(row=0, column=0, sticky=NSEW)
+        self.tree.config(height=45)
+        self.tree.grid(row=0, column=0, sticky=NS)
+        self.scrollbar.grid(row=0, column=1, sticky=NS)
+
+    # CLEAR THE WHOLE WINDOW IN ORDER TO REUSE IT
+    def clear_all(self):
         self.phrase_entry.grid_forget()
         self.table_entry.grid_forget()
         self.year_entry.grid_forget()
@@ -116,7 +125,7 @@ class UserInterface:
         self.required_label.grid_forget()
         self.phrase_label.grid_forget()
         self.table_label.grid_forget()
-        self.optional_lable.grid_forget()
+        self.optional_label.grid_forget()
         self.year_table.grid_forget()
         self.text_field_label.grid_forget()
         self.venue_label.grid_forget()
@@ -137,7 +146,7 @@ class UserInterface:
         self.table_entry.grid(row=2, column=1, pady=5)
 
         # OPTIONAL
-        self.optional_lable.grid(row=3, columnspan=2, pady=10)
+        self.optional_label.grid(row=3, columnspan=2, pady=10)
 
         self.year_table.grid(row=4, sticky=W, padx=5)
         self.year_entry.grid(row=4, column=1, pady=5)
@@ -162,13 +171,11 @@ class UserInterface:
         self.window.mainloop()
 
 
-
 def main():
     window = Tk()
     window.title("GAvI Search Engine")
     UI = UserInterface(window)
     UI.display_search()
-
 
 
 if __name__ == '__main__':
