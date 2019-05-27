@@ -1,20 +1,67 @@
 # GestioneInformazione
+Python graphical interface to query dblp data.
+## Getting Started
+How to properly download and install `GestioneInformazione`.
+### Prerequisites
+Few things are required.
+* Python3
 
-Progetto per il mitico esame di Gestione dell'Informazione Avanzata(è la prima volta che uso GitHub per qualcosa che non sia scaricare puttanate). ENJOY.
+* PostgreSQL
 
----
+Login:
+```
+$ su - postgres psql
+```
+Create user `niko` with password `nana`:
+```
+# create user niko with password 'nana';
+```
+Create DB:
+```
+# CREATE DATABASE GAvI;
+```
+And grant all privileges to that user:
+```
+# grant all privileges on database GAvI to niko;
+```
 
-### What has been done:
+* dblp.xml file
 
-Parser funzionante: estrae i dati e li infila nel database GAvI di postgresql.
-Affinchè il parser funzioni è necessario **inserire dblp.xml** nella stessa cartella in è inserito **parser.py**.
----
-Prima di importare il database da **db.gz** assicurarsi di:
-	- Avere postgresql.
-	- Estrarre l'archivio compresso db.gz con `gunzip -c db.gz | psql GAvI`.
-	- Su **postgresql** (da linea di comando eseguire `su - postgres psql`) creare l'user **niko** con password **nana** by typing `create user niko with password 'nana';`.
-	- Quindi eseguire `grant all privileges on database GAvI to niko;`.
-In questo modo dovreste riuscire a importare il db con tutti i dati. Se preferite usare pgAdmin per fare questi passaggi, feel free to do that my dudes.
+Download from [here](https://dblp.uni-trier.de/xml/) and move into GestioneInformazione/GestioneInformazione/dblp.xml
+* psycopg2
+```
+$ pip3 install psycopg2
+```
+* `GestioneInformazione` package
+```
+$ git clone https://github.com/niko0097/GestioneInformazione
+```
+Or just hit the [link](https://github.com/niko0097/GestioneInformazione) and click download.
+### Installing
+Just go into the directory `GestioneInformazione` and run the following instructions.
 
-**indexing.py** contiene la classe che crea l'indice su tutte le tabelle del database.
-	 
+Populate DB:
+```
+$ python3 GestioneInformazione/parser.py 
+```
+Create the indexes:
+```
+$ python3 GestioneInformazione/indexing.py 
+```
+Setup package:
+```
+$ python3 setup.py sdist
+```
+And install..
+```
+$ python3 setup.py install
+```
+## Running
+
+Now you are able to run our package, `supersearch` bash command is part of your system.
+## Authors
+**Cristian Gabbi** see GitHub [page](https://github.com/cristiangabbi)
+
+**Nicola Baccarani** see GitHub [page](https://github.com/niko0097)
+
+**Giorgio Martino** see GitHub [page](https://github.com/GiorgioMartino)

@@ -1,13 +1,14 @@
 '''SAX handler per il file XML.'''
 import xml.sax
 import time
-from article import *
-from inproceedings import *
-from proceedings import *
-from book import *
-from incollection import *
-from mastersthesis import *
-from phdthesis import *
+from GestioneInformazione import inproceedings
+from GestioneInformazione import proceedings
+from GestioneInformazione import book
+from GestioneInformazione import incollection
+from GestioneInformazione import mastersthesis
+from GestioneInformazione import phdthesis
+from GestioneInformazione import article
+
 import psycopg2
 import sys
 from time import time

@@ -4,7 +4,7 @@ import json
 from tkinter import *
 from tkinter import ttk
 
-from search_engine import *
+from GestioneInformazione import search_engine
 
 
 class UserInterface:
@@ -72,14 +72,14 @@ class UserInterface:
               "\nText Field: " + str(text_field) + "\nVenue: " + str(venue) + \
               "\nVenue Field: " + str(venue_field) + "\nNumber: " + str(number) + "\nRanking: " + str(ranking))
 
-        SE = searchEng(phrase,
-                       table,
-                       year=year,
-                       text_field=text_field,
-                       venue=venue,
-                       venue_field=venue_field,
-                       ranking=ranking,
-                       num=number)
+        SE = search_engine.searchEng(phrase,
+                                     table,
+                                     year=year,
+                                     text_field=text_field,
+                                     venue=venue,
+                                     venue_field=venue_field,
+                                     ranking=ranking,
+                                     num=number)
 
         records = SE.interrogation()
 
