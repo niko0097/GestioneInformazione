@@ -15,8 +15,9 @@ class UserInterface:
         self.tree_frame = Frame(self.notebook)
         self.json_frame = Frame(self.notebook)
         self.tree = ttk.Treeview(self.tree_frame)
+        self.results_label = Label()
         self.scrollbar = Scrollbar(self.tree_frame, orient='vertical', command=self.tree.yview)
-        self.json_text = Text(self.json_frame, height=55, width=200)
+        self.json_text = Text(self.json_frame, height=55, width=210)
         self.phrase_entry = Entry(self.window, width=22)
         self.table_entry = Entry(self.window, width=22)
         self.year_entry = Entry(self.window, width=22)
@@ -67,6 +68,8 @@ class UserInterface:
         # set 0 = all results
         number = self.number_scale.get()
 
+        string_label = "Phrase: " + phrase + "        Table: " + table
+
         print("\n\nNext Query includes the following parameters:\n" \
               "\nPhrase: " + phrase + "\nTable: " + table + "\nYear: " + str(year) + \
               "\nText Field: " + str(text_field) + "\nVenue: " + str(venue) + \
@@ -84,20 +87,24 @@ class UserInterface:
         records = SE.interrogation()
 
         self.clear_all()
-        self.print_view(records)
+        self.print_view(records, string_label)
 
-    def print_view(self, records):
+    def print_view(self, records, string_label):
         self.notebook.add(self.tree_frame, text="TreeView")
         self.notebook.add(self.json_frame, text="JSON")
         self.tree.heading('#0', text='Title')
         self.tree.column('#0', stretch=YES, width=1500)
         self.tree.configure(yscrollcommand=self.scrollbar.set)
+        num_results = string_label + "\nNumber of records: " + str(len(records))
+        self.results_label = Label(self.window, text=num_results)
 
         i = 0
         for rec in records:
             self.tree.insert('', 'end', iid=i, text=rec['title'])
-            self.tree.insert(i, 'end', text="Authors: " + rec['authors'])
-            self.tree.insert(i, 'end', text="Year: " + rec['year'])
+            if 'authors' in rec.keys():
+                self.tree.insert(i, 'end', text="Authors: " + rec['authors'])
+            if 'year' in rec.keys():
+                self.tree.insert(i, 'end', text="Year: " + rec['year'])
             if 'url' in rec.keys():
                 self.tree.insert(i, 'end', text="URL: " + rec['url'])
             self.tree.item(i, open=True)
@@ -106,11 +113,12 @@ class UserInterface:
 
         self.json_text.insert('end', json.dumps(ast.literal_eval(str(records)), indent=4))
 
-        self.json_text.grid(row=0, column=0, sticky=NS)
-        self.notebook.grid(row=0, column=0, sticky=NSEW)
+        self.results_label.grid(row=0, column=0, sticky=W, padx=10, pady=10)
+        self.json_text.grid(row=1, column=0, sticky=NS)
+        self.notebook.grid(row=1, column=0, sticky=NSEW)
         self.tree.config(height=45)
-        self.tree.grid(row=0, column=0, sticky=NS)
-        self.scrollbar.grid(row=0, column=1, sticky=NS)
+        self.tree.grid(row=1, column=0, sticky=NS)
+        self.scrollbar.grid(row=1, column=1, sticky=NS)
 
     # CLEAR THE WHOLE WINDOW IN ORDER TO REUSE IT
     def clear_all(self):
