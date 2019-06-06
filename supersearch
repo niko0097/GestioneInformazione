@@ -17,7 +17,8 @@ class UserInterface:
         self.tree = ttk.Treeview(self.tree_frame)
         self.results_label = Label()
         self.scrollbar = Scrollbar(self.tree_frame, orient='vertical', command=self.tree.yview)
-        self.json_text = Text(self.json_frame, height=55, width=210)
+        self.json_text = Text(self.json_frame, height=50, width=210)
+        self.back_button = Button(self.window, text="Back", font="none 14 bold", command=self.go_back_handler)
         self.phrase_entry = Entry(self.window, width=22)
         self.table_entry = Entry(self.window, width=22)
         self.year_entry = Entry(self.window, width=22)
@@ -37,6 +38,19 @@ class UserInterface:
         self.number_label = Label(self.window, text="Number of Records\n(Set 0 to see all records)", justify=LEFT)
         self.ranking_label = Label(self.window, text="Ranking Type")
         self.search_button = Button(self.window, text="SEARCH", font="none 14 bold", command=self.launch_query)
+
+    # GO BACK HANDLER, REMOVE ALL THE COMPONENTS OF THE VIEW AND display_search
+    def go_back_handler(self):
+        self.notebook.grid_forget()
+        self.tree_frame.grid_forget()
+        self.json_frame.grid_forget()
+        self.tree.grid_forget()
+        self.results_label.grid_forget()
+        self.scrollbar.grid_forget()
+        self.json_text.grid_forget()
+        self.back_button.grid_forget()
+
+        self.display_search()
 
     # CALL THE SEARCH ENGINE PASSING THE PARAMETERS
     def launch_query(self):
@@ -89,12 +103,23 @@ class UserInterface:
         self.clear_all()
         self.print_view(records, string_label)
 
+    # PRINT RESULTS FROM THE QUERY, TREEVIEW AND JSON
     def print_view(self, records, string_label):
+        if self.tree.get_children():
+            self.tree.destroy()
+            self.tree = ttk.Treeview(self.tree_frame)
+            self.json_text.destroy()
+            self.json_text = Text(self.json_frame, height=50, width=210)
+
         self.notebook.add(self.tree_frame, text="TreeView")
         self.notebook.add(self.json_frame, text="JSON")
         self.tree.heading('#0', text='Title')
         self.tree.column('#0', stretch=YES, width=1500)
         self.tree.configure(yscrollcommand=self.scrollbar.set)
+        if records == -1 or records == 0:
+            # TODO PRINT ERROR IN SOME WAY
+            self.go_back_handler()
+            return
         num_results = string_label + "\nNumber of records: " + str(len(records))
         self.results_label = Label(self.window, text=num_results)
 
@@ -113,12 +138,13 @@ class UserInterface:
 
         self.json_text.insert('end', json.dumps(ast.literal_eval(str(records)), indent=4))
 
-        self.results_label.grid(row=0, column=0, sticky=W, padx=10, pady=10)
-        self.json_text.grid(row=1, column=0, sticky=NS)
-        self.notebook.grid(row=1, column=0, sticky=NSEW)
-        self.tree.config(height=45)
-        self.tree.grid(row=1, column=0, sticky=NS)
-        self.scrollbar.grid(row=1, column=1, sticky=NS)
+        self.results_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
+        self.back_button.grid(row=1, column=0, ipady=5, ipadx=5, pady=10)
+        self.json_text.grid(row=2, column=0, sticky=NS)
+        self.notebook.grid(row=2, column=0, sticky=NSEW)
+        self.tree.config(height=40)
+        self.tree.grid(row=2, column=0, sticky=NS)
+        self.scrollbar.grid(row=2, column=1, sticky=NS)
 
     # CLEAR THE WHOLE WINDOW IN ORDER TO REUSE IT
     def clear_all(self):
