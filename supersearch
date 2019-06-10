@@ -3,6 +3,7 @@ import ast
 import json
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 
 from GestioneInformazione import search_engine
 
@@ -54,15 +55,18 @@ class UserInterface:
 
     # CALL THE SEARCH ENGINE PASSING THE PARAMETERS
     def launch_query(self):
-        phrase = self.phrase_entry.get()
-        table = self.table_entry.get()
-        # add more controls on input type (table)
+        # TODO CLEAN STRING
+        phrase = str(self.phrase_entry.get())
+        table = str(self.table_entry.get())
         if not phrase or not table:
-            print('Error')
+            messagebox.showerror(title="Error", message="Both \"Phrase\" and \"Table\" must be filled.")
             return
 
+        if table not in ["articles","book","incollections","inproceedings","mastersthesis","phdthesis","proceedings"]:
+            messagebox.showerror(title="Error", message="Table not valid.")
+
         year = self.year_entry.get()
-        # if not int?
+        # TODO IF NOT INT?
         if year:
             year = int(year)
         else:
@@ -81,13 +85,15 @@ class UserInterface:
             ranking = None
         # set 0 = all results
         number = self.number_scale.get()
+        if number == 0:
+            number = None
 
         string_label = "Phrase: " + phrase + "        Table: " + table
 
-        print("\n\nNext Query includes the following parameters:\n" \
-              "\nPhrase: " + phrase + "\nTable: " + table + "\nYear: " + str(year) + \
-              "\nText Field: " + str(text_field) + "\nVenue: " + str(venue) + \
-              "\nVenue Field: " + str(venue_field) + "\nNumber: " + str(number) + "\nRanking: " + str(ranking))
+        # print("\n\nNext Query includes the following parameters:\n" \
+        #       "\nPhrase: " + phrase + "\nTable: " + table + "\nYear: " + str(year) + \
+        #       "\nText Field: " + str(text_field) + "\nVenue: " + str(venue) + \
+        #       "\nVenue Field: " + str(venue_field) + "\nNumber: " + str(number) + "\nRanking: " + str(ranking))
 
         SE = search_engine.searchEng(phrase,
                                      table,
@@ -100,11 +106,13 @@ class UserInterface:
 
         records = SE.interrogation()
 
-        self.clear_all()
-        self.print_view(records, string_label)
+        if records is not None:
+            self.clear_all()
+            self.print_view(records, string_label)
 
     # PRINT RESULTS FROM THE QUERY, TREEVIEW AND JSON
     def print_view(self, records, string_label):
+        # TODO TRY IT OUT ON DIFFERENT MACHINE
         if self.tree.get_children():
             self.tree.destroy()
             self.tree = ttk.Treeview(self.tree_frame)
@@ -117,7 +125,7 @@ class UserInterface:
         self.tree.column('#0', stretch=YES, width=1500)
         self.tree.configure(yscrollcommand=self.scrollbar.set)
         if records == -1 or records == 0:
-            # TODO PRINT ERROR IN SOME WAY
+            messagebox.showwarning(title="Warning", message="No records found.")
             self.go_back_handler()
             return
         num_results = string_label + "\nNumber of records: " + str(len(records))
@@ -125,16 +133,19 @@ class UserInterface:
 
         i = 0
         for rec in records:
-            self.tree.insert('', 'end', iid=i, text=rec['title'])
-            if 'authors' in rec.keys():
-                self.tree.insert(i, 'end', text="Authors: " + rec['authors'])
-            if 'year' in rec.keys():
-                self.tree.insert(i, 'end', text="Year: " + rec['year'])
-            if 'url' in rec.keys():
-                self.tree.insert(i, 'end', text="URL: " + rec['url'])
-            self.tree.item(i, open=True)
+            try:
+                self.tree.insert('', 'end', iid=i, text=rec['title'])
+                if 'authors' in rec.keys():
+                    self.tree.insert(i, 'end', text="Authors: " + rec['authors'])
+                if 'year' in rec.keys():
+                    self.tree.insert(i, 'end', text="Year: " + rec['year'])
+                if 'url' in rec.keys():
+                    self.tree.insert(i, 'end', text="URL: " + rec['url'])
+                self.tree.item(i, open=True)
 
-            i += 1
+                i += 1
+            except Exception:
+                print("[Error printing following record]   " + str(rec))
 
         self.json_text.insert('end', json.dumps(ast.literal_eval(str(records)), indent=4))
 

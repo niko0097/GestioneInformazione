@@ -28,9 +28,9 @@ And grant all privileges to that user:
 * dblp.xml file
 
 Download from [here](https://dblp.uni-trier.de/xml/) and move into GestioneInformazione/GestioneInformazione/dblp.xml
-* psycopg2
+* psycopg2 and rank_bm25
 ```
-$ pip3 install psycopg2
+$ pip3 install [psycopg2 | rank_bm25]
 ```
 * `GestioneInformazione` package
 ```

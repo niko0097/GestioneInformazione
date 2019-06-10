@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-import sys
-import psycopg2
 import argparse
+import sys
+from tkinter import messagebox
 
+import psycopg2
 # Algoritmo di ranking bm25
-# In caso non sia instalalto eseguire 'pip3 install rank_bm25'
+# In caso non sia installato eseguire 'pip3 install rank_bm25'
 from rank_bm25 import BM25Okapi
 
 
@@ -419,12 +420,17 @@ class searchEng():
     # -1 se si verrifica un errore.
     def interrogation(self):
         # Connessione con il db
-        print("Connessione con database...")
-        conn = psycopg2.connect(host='localhost',
-                                database='GAvI',
-                                user='niko',
-                                password='nana')
-        cur = conn.cursor()
+        # print("Connessione con database...")
+        try:
+            conn = psycopg2.connect(host='localhost',
+                                    database='GAvI',
+                                    user='niko',
+                                    password='nana')
+            cur = conn.cursor()
+        except Exception:
+            messagebox.showerror(title="Error", message="Is the server running on host \"localhost\" (127.0.0.1) and "
+                                                        "accepting TCP/IP connections on port 5432?")
+            return
 
         try:
             # Caso in cui ricercare in tutte le tabelle
@@ -456,7 +462,7 @@ class searchEng():
 
                 cur.close()
                 conn.close()
-                print("Esecuzione completata.")
+                # print("Esecuzione completata.")
                 return dic
 
             # Caso in cui ricercare in una sola tabella
@@ -467,7 +473,7 @@ class searchEng():
                 ret = cur.fetchall()
                 cur.close()
                 conn.close()
-                print("Esecuzione completata.")
+                # print("Esecuzione completata.")
 
                 # Trasformazione della lista in dizionario
                 pre_ranking = self.__getDictResults(ret)
