@@ -207,18 +207,18 @@ class searchEng():
 
             # Creazione della query
             query = """
-                        SELECT x.key,x.title,x.authors,x.year,x.{3},
-                        {2} as ts_x
-                        {4}
-                        FROM {0} as x,
-                        to_tsquery('{1}') as query
-                        WHERE {2} @@ query;
-                    """.format( self.tab,       #0
-                                self.phrase,    #1
-                                chance_x,       #2
-                                url_or_ee,      #3
-                                rank            #4
-                                )
+                SELECT x.key,x.title,x.authors,x.year,x.{3},
+                {2} as ts_x
+                {4}
+                FROM {0} as x,
+                to_tsquery('{1}') as query
+                WHERE {2} @@ query;
+                """.format( self.tab,       #0
+                            self.phrase,    #1
+                            chance_x,       #2
+                            url_or_ee,      #3
+                            rank            #4
+                            )
         # Restituzione query
         print(query)
         return query
@@ -441,7 +441,7 @@ class searchEng():
 
                     # Recupero dei risultati
                     self.tab = tab
-                    print("Esecuzione query su ",self.tab)
+                    # print("Esecuzione query su ",self.tab)
                     query = self.__getQuery()
                     cur.execute(query)
                     ret = cur.fetchall()
@@ -467,7 +467,7 @@ class searchEng():
 
             # Caso in cui ricercare in una sola tabella
             elif self.tab in self.tables:
-                print("Esecuzione query su ",self.tab)
+                # print("Esecuzione query su ",self.tab)
                 query = self.__getQuery()
                 cur.execute(query)
                 ret = cur.fetchall()

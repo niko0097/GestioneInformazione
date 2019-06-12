@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import ast
 import json
+import re
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -55,9 +56,10 @@ class UserInterface:
 
     # CALL THE SEARCH ENGINE PASSING THE PARAMETERS
     def launch_query(self):
-        # TODO CLEAN STRING
-        phrase = str(self.phrase_entry.get())
-        table = str(self.table_entry.get())
+        phrase = re.sub(' +', ' ', str(self.phrase_entry.get()))
+        phrase = phrase.strip()
+        table = re.sub(' +', ' ', str(self.table_entry.get()))
+        table = table.strip()
         if not phrase or not table:
             messagebox.showerror(title="Error", message="Both \"Phrase\" and \"Table\" must be filled.")
             return
@@ -66,15 +68,19 @@ class UserInterface:
             messagebox.showerror(title="Error", message="Table not valid.")
 
         year = self.year_entry.get()
-        # TODO IF NOT INT?
         if year:
-            year = int(year)
+            try:
+                year = int(year)
+            except ValueError:
+                messagebox.showerror(title="Error", message="Year value must be int.")
+                return
         else:
             year = None
         text_field = self.text_field_cbb.get()
         if text_field == "":
             text_field = None
-        venue = self.venue_entry.get()
+        venue = re.sub(' +', ' ', str(self.venue_entry.get()))
+        venue = venue.strip()
         if venue == "":
             venue = None
         venue_field = self.venue_field_cbb.get()
