@@ -64,7 +64,7 @@ class UserInterface:
             messagebox.showerror(title="Error", message="Both \"Phrase\" and \"Table\" must be filled.")
             return
 
-        if table not in ["articles","book","incollections","inproceedings","mastersthesis","phdthesis","proceedings"]:
+        if table not in ["articles","book","incollection","inproceedings","mastersthesis","phdthesis","proceedings"]:
             messagebox.showerror(title="Error", message="Table not valid.")
 
         year = self.year_entry.get()
@@ -96,11 +96,6 @@ class UserInterface:
 
         string_label = "Phrase: " + phrase + "        Table: " + table
 
-        # print("\n\nNext Query includes the following parameters:\n" \
-        #       "\nPhrase: " + phrase + "\nTable: " + table + "\nYear: " + str(year) + \
-        #       "\nText Field: " + str(text_field) + "\nVenue: " + str(venue) + \
-        #       "\nVenue Field: " + str(venue_field) + "\nNumber: " + str(number) + "\nRanking: " + str(ranking))
-
         SE = search_engine.searchEng(phrase,
                                      table,
                                      year=year,
@@ -125,8 +120,8 @@ class UserInterface:
             self.json_text.destroy()
             self.json_text = Text(self.json_frame, height=50, width=210)
 
-        self.notebook.add(self.tree_frame, text="TreeView")
         self.notebook.add(self.json_frame, text="JSON")
+        self.notebook.add(self.tree_frame, text="TreeView")
         self.tree.heading('#0', text='Title')
         self.tree.column('#0', stretch=YES, width=1500)
         self.tree.configure(yscrollcommand=self.scrollbar.set)
@@ -140,13 +135,33 @@ class UserInterface:
         i = 0
         for rec in records:
             try:
-                self.tree.insert('', 'end', iid=i, text=rec['title'])
-                if 'authors' in rec.keys():
-                    self.tree.insert(i, 'end', text="Authors: " + rec['authors'])
-                if 'year' in rec.keys():
-                    self.tree.insert(i, 'end', text="Year: " + rec['year'])
-                if 'url' in rec.keys():
-                    self.tree.insert(i, 'end', text="URL: " + rec['url'])
+                # NORMAL RECORD
+                if 'title' in rec.keys():
+                    self.tree.insert('', 'end', iid=i, text=rec['title'])
+                    if 'authors' in rec.keys():
+                        self.tree.insert(i, 'end', text="Authors: " + rec['authors'])
+                    if 'year' in rec.keys():
+                        self.tree.insert(i, 'end', text="Year: " + rec['year'])
+                    if 'url' in rec.keys():
+                        self.tree.insert(i, 'end', text="URL: " + rec['url'])
+                # INPROCEEDINGS --> PRINT INFO RELATIVE TO PROCEEDINGS TOO
+                elif 'i_title' in rec.keys():
+                    self.tree.insert('', 'end', iid=i, text=rec['i_title'])
+                    if 'i_authors' in rec.keys():
+                        self.tree.insert(i, 'end', text="Authors: " + rec['i_authors'])
+                    if 'i_year' in rec.keys():
+                        self.tree.insert(i, 'end', text="Year: " + rec['i_year'])
+                    if 'i_url' in rec.keys():
+                        self.tree.insert(i, 'end', text="URL: " + rec['i_url'])
+                    if 'p_title' in rec.keys():
+                        self.tree.insert(i, 'end', text="Proceedings Title: " + rec['p_title'])
+                    if 'p_publisher' in rec.keys():
+                        self.tree.insert(i, 'end', text="Proceedings Publisher: " + rec['p_publisher'])
+                    if 'p_year' in rec.keys():
+                        self.tree.insert(i, 'end', text="Proceedings Year: " + rec['p_year'])
+                    if 'p_url' in rec.keys():
+                        self.tree.insert(i, 'end', text="Proceedings URL: " + rec['p_url'])
+
                 self.tree.item(i, open=True)
 
                 i += 1
