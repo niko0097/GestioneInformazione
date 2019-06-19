@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import ast
 import json
-import re
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -28,7 +27,8 @@ class UserInterface:
         self.venue_entry = Entry(self.window, width=22)
         self.venue_field_cbb = ttk.Combobox(self.window, values=['title', 'publisher', 'journal'])
         self.number_scale = Scale(from_=0, to=200, resolution=10, orient=HORIZONTAL, length=200)
-        self.ranking_cbb = ttk.Combobox(self.window, values=['boolean', 'bm25', 'BM25'])
+        self.ranking_cbb = ttk.Combobox(self.window, values=['boolean', 'bm25'])
+        self.ranking_cbb.set('boolean')
         self.required_label = Label(self.window, text="Required Fields", font="none 18 bold")
         self.phrase_label = Label(self.window, text="Phrase")
         self.table_label = Label(self.window, text="Table")
@@ -64,7 +64,8 @@ class UserInterface:
             messagebox.showerror(title="Error", message="Both \"Phrase\" and \"Table\" must be filled.")
             return
 
-        if table not in ["articles","book","incollection","inproceedings","mastersthesis","phdthesis","proceedings"]:
+        if table not in ["articles", "book", "incollection", "inproceedings", "mastersthesis", "phdthesis",
+                         "proceedings"]:
             messagebox.showerror(title="Error", message="Table not valid.")
 
         year = self.year_entry.get()
