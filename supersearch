@@ -126,7 +126,7 @@ class UserInterface:
         self.tree.heading('#0', text='Title')
         self.tree.column('#0', stretch=YES, width=1500)
         self.tree.configure(yscrollcommand=self.scrollbar.set)
-        if records == -1 or records == 0:
+        if records == -1 or len(records) == 0:
             messagebox.showwarning(title="Warning", message="No records found.")
             self.go_back_handler()
             return
