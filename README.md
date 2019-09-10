@@ -30,7 +30,7 @@ And grant all privileges to that user:
 Download from [here](https://dblp.uni-trier.de/xml/) and move into GestioneInformazione/GestioneInformazione/dblp.xml
 * psycopg2 and rank_bm25
 ```
-$ pip3 install [psycopg2 | rank_bm25]
+$ pip3 install [psycopg2 | rank_bm25 | nltk]
 ```
 * `GestioneInformazione` package
 ```
@@ -40,14 +40,6 @@ Or just hit the [link](https://github.com/niko0097/GestioneInformazione) and cli
 ### Installing
 Just go into the directory `GestioneInformazione` and run the following instructions.
 
-Populate DB:
-```
-$ python3 GestioneInformazione/parser.py 
-```
-Create the indexes:
-```
-$ python3 GestioneInformazione/indexing.py 
-```
 Setup package:
 ```
 $ python3 setup.py sdist
@@ -55,6 +47,14 @@ $ python3 setup.py sdist
 And install..
 ```
 $ python3 setup.py install
+```
+Populate DB:
+```
+$ python3 GestioneInformazione/parser.py
+```
+Create the indexes:
+```
+$ python3 GestioneInformazione/indexing.py
 ```
 ## Running
 
