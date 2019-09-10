@@ -34,23 +34,28 @@ class indexer:
                     ALTER TABLE {} ADD COLUMN ts_title tsvector;
                     ALTER TABLE {} ADD COLUMN ts_authors tsvector;
                     ALTER TABLE {} ADD COLUMN ts_year tsvector;
+                    ALTER TABLE {} ADD COLUMN ts_text_all tsvector;
+                    ALTER TABLE {} ADD COLUMN ts_venue_all tsvector;
 
                     UPDATE {} SET ts_title = to_tsvector(title);
                     UPDATE {} SET ts_authors = to_tsvector(authors);
                     UPDATE {} SET ts_year = to_tsvector(year);
-                    """.format(tab,tab,tab,tab,tab,tab)
+                    UPDATE {} SET ts_text_all = to_tsvector(title || ' ' || authors || ' ' || year);
+                    """.format(tab,tab,tab,tab,tab,tab,tab,tab,tab)
 
             query2 = ""
             if tab == 'articles':
                 query2 = """
                         ALTER TABLE {} ADD COLUMN ts_journal tsvector;
                         UPDATE {} SET ts_journal = to_tsvector(journal);
-                        """.format(tab,tab)
+                        UPDATE {} SET ts_venue_all = to_tsvector(title || ' ' || journal);
+                        """.format(tab,tab,tab)
             elif tab in ['proceedings','book','incollection']:
                 query2 = """
                         ALTER TABLE {} ADD COLUMN ts_publisher tsvector;
                         UPDATE {} SET ts_publisher = to_tsvector(publisher);
-                        """.format(tab,tab)
+                        UPDATE {} SET ts_venue_all = to_tsvector(title || ' ' || publisher);
+                        """.format(tab,tab,tab)
 
             try:
                 print("Modifing and updating {} table...".format(tab))
@@ -68,11 +73,20 @@ class indexer:
 
             # Creazione effettiva dell'indice
             if tab in ['mastersthesis','phdthesis','inproceedings']:
-                query = """CREATE INDEX {}_idx ON {} USING GIN(ts_title,ts_authors,ts_year);""".format(tab,tab)
+                query = """
+                        CREATE INDEX {}_idx ON {}
+                        USING GIN(ts_title,ts_authors,ts_year,ts_text_all);
+                        """.format(tab,tab)
             elif tab == 'articles':
-                query = """CREATE INDEX {}_idx ON {} USING GIN(ts_title,ts_authors,ts_year,ts_journal);""".format(tab,tab)
+                query = """
+                        CREATE INDEX {}_idx ON {}
+                        USING GIN(ts_title,ts_authors,ts_year,ts_journal,ts_text_all,ts_venue_all);
+                        """.format(tab,tab)
             else:
-                query = """CREATE INDEX {}_idx ON {} USING GIN(ts_title,ts_authors,ts_year,ts_publisher);""".format(tab,tab)
+                query = """
+                        CREATE INDEX {}_idx ON {}
+                        USING GIN(ts_title,ts_authors,ts_year,ts_publisher,ts_text_all,ts_venue_all);
+                        """.format(tab,tab)
 
             try:
                 print("Creating index on {}...".format(tab))
@@ -109,12 +123,14 @@ class indexer:
                 return
 
             query = """
-                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_title
-                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_authors
-                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_year
-                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_journal
-                    ALTER TABLE {} DROP COLUMN IF EXISTS ts_publisher;
-                    """.format(tab,tab,tab,tab,tab)
+                    ALTER TABLE {0} DROP COLUMN IF EXISTS ts_title;
+                    ALTER TABLE {0} DROP COLUMN IF EXISTS ts_authors;
+                    ALTER TABLE {0} DROP COLUMN IF EXISTS ts_year;
+                    ALTER TABLE {0} DROP COLUMN IF EXISTS ts_journal;
+                    ALTER TABLE {0} DROP COLUMN IF EXISTS ts_publisher;
+                    ALTER TABLE {0} DROP COLUMN IF EXISTS ts_text_all;
+                    ALTER TABLE {0} DROP COLUMN IF EXISTS ts_venue_all;
+                    """.format(tab)
             try:
                 print("Deleting ts_elements on {}...".format(tab))
                 cur.execute(query)

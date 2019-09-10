@@ -43,7 +43,8 @@ class searchEng():
         if self.year != None and self.text_field == 'year':
             self.phrase = str(self.year).replace(" "," | ")
         elif self.year != None:
-            self.phrase += ' | ' + str(kwargs['year']) #potrebbe essere necessario sostituire '|' con '&'
+            self.phrase = '({}) & {}'.format(self.phrase, str(kwargs['year']))
+            #potrebbe essere necessario sostituire '&' con '|'
 
 
 
@@ -56,8 +57,8 @@ class searchEng():
         if self.venue != None and self.tab in ['inproceedings']:
 
             # Query-injection dei campi su cui fare full-text-search di 'phrase' e 'venue'
-            chance_x = "x.ts_title||' '||x.ts_authors||' '||x.ts_year"
-            chance_p = "p.ts_title||' '||p.ts_publisher"
+            chance_x = "x.ts_text_all"
+            chance_p = "p.ts_venue_all"
 
             # Casi in cui text_field e venue_field siano stati inseriti
             if self.text_field != None:
@@ -99,8 +100,8 @@ class searchEng():
         elif self.venue != None and self.tab in ['articles']:
 
             # Query-injection dei campi su cui fare full-text-search di 'phrase' e 'venue'
-            chance_x = "x.ts_title||' '||x.ts_authors||' '||x.ts_year"
-            chance_v = "x.ts_title||' '||x.ts_journal "
+            chance_x = "x.ts_text_all"
+            chance_v = "x.ts_venue_all "
 
             # Casi in cui text_field e venue_field siano stati inseriti
             if self.text_field != None:
@@ -140,8 +141,8 @@ class searchEng():
         elif self.venue != None and self.tab not in ['mastersthesis','phdthesis']:
 
             # Query-injection dei campi su cui fare full-text-search di 'phrase' e 'venue'
-            chance_x = "x.ts_title||' '||x.ts_authors||' '||x.ts_year "
-            chance_v = "x.ts_title||' '||x.ts_publisher"
+            chance_x = "x.ts_text_all"
+            chance_v = "x.ts_venue_all "
 
             # Casi in cui text_field e venue_field siano stati inseriti
             if self.text_field != None:
@@ -186,7 +187,7 @@ class searchEng():
         # Query standard, senza VENUE
         else:
             # Query-injection dei campi su cui fare full-text-search di 'phrase'
-            chance_x = "x.ts_title||' '||x.ts_authors||' '||x.ts_year"
+            chance_x = "x.ts_text_all"
 
             # Caso in cui il text_field sia stato inserito
             if self.text_field != None:
