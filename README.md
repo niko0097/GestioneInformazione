@@ -12,6 +12,10 @@ Login:
 ```
 $ su - postgres psql
 ```
+Or
+```
+$ sudo -u postgres psql postgres
+```
 Create user `niko` with password `nana`:
 ```
 # create user niko with password 'nana';

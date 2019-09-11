@@ -1,6 +1,7 @@
 dblp*.xml
 .DS_Store
 .idea*
+error.txt
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

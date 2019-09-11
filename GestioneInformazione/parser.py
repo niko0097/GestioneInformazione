@@ -24,7 +24,7 @@ def correctStr(stringa):
 
 class DBLPHandler(xml.sax.ContentHandler):
 	def __init__(self):
-		self.x = article()
+		self.x = article.article()
 		self.CurrentData = ''
 		self.ee = []
 		self.editor = []
@@ -67,17 +67,17 @@ class DBLPHandler(xml.sax.ContentHandler):
 		global x
 		self.CurrentData = tag
 		if tag == 'inproceedings':
-			x = inproceedings()
+			x = inproceedings.inproceedings()
 			x.key = attr['key']
 			x.mdate = attr['mdate']
 
 		elif tag == 'incollection':
-			x = incollection()
+			x = incollection.incollection()
 			x.key = attr['key']
 			x.mdate = attr['mdate']
 
 		elif tag == 'mastersthesis':
-			x = mastersthesis()
+			x = mastersthesis.mastersthesis()
 			x.key = attr['key']
 			x.mdate = attr['mdate']
 			#print("mastersthesis")
@@ -88,23 +88,23 @@ class DBLPHandler(xml.sax.ContentHandler):
 		#	x.mdate = attr['mdate']
 
 		elif tag == 'phdthesis':
-			x = phdthesis()
+			x = phdthesis.phdthesis()
 			x.key = attr['key']
 			x.mdate = attr['mdate']
 			#print("phdthesis")
 
 		elif tag == 'proceedings':
-			x = proceedings()
+			x = proceedings.proceedings()
 			x.key = attr['key']
 			x.mdate = attr['mdate']
 
 		elif tag == 'book':
-			x = book()
+			x = book.book()
 			x.key = attr['key']
 			x.mdate = attr['mdate']
 
 		elif tag == 'article':
-			x = article()
+			x = article.article()
 			x.key = attr['key']
 			x.mdate = attr['mdate']
 
@@ -201,7 +201,7 @@ class DBLPHandler(xml.sax.ContentHandler):
 		content = correctStr(content)
 
 		if self.CurrentData == "author":
-		    self.author = content
+			self.author = content
 
 		if self.CurrentData == "title":
 			self.title = content
@@ -277,40 +277,30 @@ class DBLPHandler(xml.sax.ContentHandler):
 
 if __name__ == '__main__':
 	try:
-		#conn = psycopg2.connect(host="localhost",database="gavi_final", user="niko", password="nana") #latest
 		conn = psycopg2.connect(host="localhost",database="GAvI", user="niko", password="nana")
-		#conn = psycopg2.connect(host="localhost",database="parseeeeeeeer", user="gabbi", password="boris")
 		c = conn.cursor()
 
-		###########################
-		### CREO LE TABELLE ###
-		x = article()
+		# CREO LE TABELLE #
+		x = article.article()
 		c.execute(x.table())
 
-		x = incollection()
+		x = incollection.incollection()
 		c.execute(x.table())
 
-		x = book()
+		x = book.book()
 		c.execute(x.table())
 
-		x = inproceedings()
+		x = inproceedings.inproceedings()
 		c.execute(x.table())
 
-		x = proceedings()
+		x = proceedings.proceedings()
 		c.execute(x.table())
 
-		x = mastersthesis()
+		x = mastersthesis.mastersthesis()
 		c.execute(x.table())
 
-		x = phdthesis()
+		x = phdthesis.phdthesis()
 		c.execute(x.table())
-
-		#x = www()
-		#c.execute(x.table())
-
-		##########################
-		##########################
-
 
 		current = 0
 		# create an XMLReader
