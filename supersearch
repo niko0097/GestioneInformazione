@@ -18,7 +18,7 @@ class UserInterface:
         self.tree = ttk.Treeview(self.tree_frame)
         self.results_label = Label()
         self.scrollbar = Scrollbar(self.tree_frame, orient='vertical', command=self.tree.yview)
-        self.json_text = Text(self.json_frame, height=50, width=210)
+        self.json_text = Text(self.json_frame, height=44, width=194)
         self.back_button = Button(self.window, text="Back", font="none 14 bold", command=self.go_back_handler)
         self.phrase_entry = Entry(self.window, width=22)
         self.table_entry = Entry(self.window, width=22)
@@ -119,12 +119,12 @@ class UserInterface:
             self.tree.destroy()
             self.tree = ttk.Treeview(self.tree_frame)
             self.json_text.destroy()
-            self.json_text = Text(self.json_frame, height=50, width=210)
+            self.json_text = Text(self.json_frame, height=44, width=194)
 
-        self.notebook.add(self.json_frame, text="JSON")
         self.notebook.add(self.tree_frame, text="TreeView")
+        self.notebook.add(self.json_frame, text="JSON")
         self.tree.heading('#0', text='Title')
-        self.tree.column('#0', stretch=YES, width=1500)
+        self.tree.column('#0', stretch=YES, width=1350)
         self.tree.configure(yscrollcommand=self.scrollbar.set)
         if records == -1 or len(records) == 0:
             messagebox.showwarning(title="Warning", message="No records found.")
@@ -155,13 +155,13 @@ class UserInterface:
                     if 'i_url' in rec.keys():
                         self.tree.insert(i, 'end', text="URL: " + rec['i_url'])
                     if 'p_title' in rec.keys():
-                        self.tree.insert(i, 'end', text="Proceedings Title: " + rec['p_title'])
+                        self.tree.insert(i, 'end', text="Proceeding Title: " + rec['p_title'])
                     if 'p_publisher' in rec.keys():
-                        self.tree.insert(i, 'end', text="Proceedings Publisher: " + rec['p_publisher'])
+                        self.tree.insert(i, 'end', text="Proceeding Publisher: " + rec['p_publisher'])
                     if 'p_year' in rec.keys():
-                        self.tree.insert(i, 'end', text="Proceedings Year: " + rec['p_year'])
+                        self.tree.insert(i, 'end', text="Proceeding Year: " + rec['p_year'])
                     if 'p_url' in rec.keys():
-                        self.tree.insert(i, 'end', text="Proceedings URL: " + rec['p_url'])
+                        self.tree.insert(i, 'end', text="Proceeding URL: " + rec['p_url'])
 
                 self.tree.item(i, open=True)
 
@@ -173,9 +173,9 @@ class UserInterface:
 
         self.results_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
         self.back_button.grid(row=1, column=0, ipady=5, ipadx=5, pady=10)
-        self.json_text.grid(row=2, column=0, sticky=NS)
+        self.json_text.grid(row=2, column=0, sticky=NSEW)
         self.notebook.grid(row=2, column=0, sticky=NSEW)
-        self.tree.config(height=40)
+        self.tree.config(height=28)
         self.tree.grid(row=2, column=0, sticky=NS)
         self.scrollbar.grid(row=2, column=1, sticky=NS)
 
