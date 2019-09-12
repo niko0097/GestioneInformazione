@@ -10,6 +10,7 @@ import psycopg2
 # su uno di questi 3 campi singolarmente, o su tutti e 3 assieme.
 # A seconda della tabella, è poi necessario indicizzare un altro campo (publisher o journal) per velocizzare le ricerche
 # della venue
+# Sono creati due indici: uno per la phrasal search, uno per la venue search
 class indexer:
     def __init__(self):
         self.tables = ['articles','book','incollection','inproceedings','mastersthesis','phdthesis','proceedings']
@@ -31,31 +32,31 @@ class indexer:
         # Su ogni tabella viene creata una colonna per ogni campo di ricerca. I dati all'interno sono tsvector
         for tab in self.tables:
             query = """
-                    ALTER TABLE {} ADD COLUMN ts_title tsvector;
-                    ALTER TABLE {} ADD COLUMN ts_authors tsvector;
-                    ALTER TABLE {} ADD COLUMN ts_year tsvector;
-                    ALTER TABLE {} ADD COLUMN ts_text_all tsvector;
-                    ALTER TABLE {} ADD COLUMN ts_venue_all tsvector;
+                    ALTER TABLE {0} ADD COLUMN ts_title tsvector;
+                    ALTER TABLE {0} ADD COLUMN ts_authors tsvector;
+                    ALTER TABLE {0} ADD COLUMN ts_year tsvector;
+                    ALTER TABLE {0} ADD COLUMN ts_text_all tsvector;
+                    ALTER TABLE {0} ADD COLUMN ts_venue_all tsvector;
 
-                    UPDATE {} SET ts_title = to_tsvector(title);
-                    UPDATE {} SET ts_authors = to_tsvector(authors);
-                    UPDATE {} SET ts_year = to_tsvector(year);
-                    UPDATE {} SET ts_text_all = to_tsvector(title || ' ' || authors || ' ' || year);
-                    """.format(tab,tab,tab,tab,tab,tab,tab,tab,tab)
+                    UPDATE {0} SET ts_title = to_tsvector(title);
+                    UPDATE {0} SET ts_authors = to_tsvector(authors);
+                    UPDATE {0} SET ts_year = to_tsvector(year);
+                    UPDATE {0} SET ts_text_all = to_tsvector(title || ' ' || authors || ' ' || year);
+                    """.format(tab)
 
             query2 = ""
             if tab == 'articles':
                 query2 = """
-                        ALTER TABLE {} ADD COLUMN ts_journal tsvector;
-                        UPDATE {} SET ts_journal = to_tsvector(journal);
-                        UPDATE {} SET ts_venue_all = to_tsvector(title || ' ' || journal);
-                        """.format(tab,tab,tab)
+                        ALTER TABLE {0} ADD COLUMN ts_journal tsvector;
+                        UPDATE {0} SET ts_journal = to_tsvector(journal);
+                        UPDATE {0} SET ts_venue_all = to_tsvector(title || ' ' || journal);
+                        """.format(tab)
             elif tab in ['proceedings','book','incollection']:
                 query2 = """
-                        ALTER TABLE {} ADD COLUMN ts_publisher tsvector;
-                        UPDATE {} SET ts_publisher = to_tsvector(publisher);
-                        UPDATE {} SET ts_venue_all = to_tsvector(title || ' ' || publisher);
-                        """.format(tab,tab,tab)
+                        ALTER TABLE {0} ADD COLUMN ts_publisher tsvector;
+                        UPDATE {0} SET ts_publisher = to_tsvector(publisher);
+                        UPDATE {0} SET ts_venue_all = to_tsvector(title || ' ' || publisher);
+                        """.format(tab)
 
             try:
                 print("Modifing and updating {} table...".format(tab))
@@ -71,22 +72,28 @@ class indexer:
                 conn.close()
                 return
 
-            # Creazione effettiva dell'indice
+            # Creazione effettiva dell'indice (uno per venue search, uno per phrasal search)
             if tab in ['mastersthesis','phdthesis','inproceedings']:
                 query = """
-                        CREATE INDEX {}_idx ON {}
+                        CREATE INDEX {0}_idx ON {0}
                         USING GIN(ts_title,ts_authors,ts_year,ts_text_all);
-                        """.format(tab,tab)
+                        """.format(tab)
             elif tab == 'articles':
                 query = """
-                        CREATE INDEX {}_idx ON {}
-                        USING GIN(ts_title,ts_authors,ts_year,ts_journal,ts_text_all,ts_venue_all);
-                        """.format(tab,tab)
+                        CREATE INDEX {0}_phrasal_idx ON {0}
+                        USING GIN(ts_title,ts_authors,ts_year,ts_text_all);
+
+                        CREATE INDEX {0}_venue_idx ON {0}
+                        USING GIN(ts_journal,ts_venue_all);
+                        """.format(tab)
             else:
                 query = """
-                        CREATE INDEX {}_idx ON {}
-                        USING GIN(ts_title,ts_authors,ts_year,ts_publisher,ts_text_all,ts_venue_all);
-                        """.format(tab,tab)
+                        CREATE INDEX {0}_phrasal_idx ON {0}
+                        USING GIN(ts_title,ts_authors,ts_year,ts_text_all);
+
+                        CREATE INDEX {0}_venue_idx ON {0}
+                        USING GIN(ts_publisher,ts_venue_all);
+                        """.format(tab)
 
             try:
                 print("Creating index on {}...".format(tab))
@@ -111,7 +118,11 @@ class indexer:
         print("Connection established.")
 
         for tab in self.tables:
-            query = """DROP INDEX IF EXISTS {}_idx;""".format(tab)
+            query = """
+                    DROP INDEX IF EXISTS {0}_idx;
+                    DROP INDEX IF EXISTS {0}_phrasal_idx;
+                    DROP INDEX IF EXISTS {0}_venue_idx;
+                    """.format(tab)
             try:
                 print("Dropping index on {}...".format(tab))
                 cur.execute(query)
@@ -147,6 +158,9 @@ class indexer:
 
 # Script per la creazione dell'indice da terminale. Se si lancia questo script si presuppone che si voglia creare
 # l'indice E BASTA
-if __name__ == '__main__':
+if (sys.argv[1] == 'create'):
     ind = indexer()
     ind.createColIndex()
+elif(sys.argv[1] == 'delete'):
+    ind = indexer()
+    ind.deleteIdx()
