@@ -58,7 +58,7 @@ $ python3 GestioneInformazione/parser.py
 ```
 Create the indexes:
 ```
-$ python3 GestioneInformazione/indexing.py
+$ python3 GestioneInformazione/indexing.py create
 ```
 ## Running
 
