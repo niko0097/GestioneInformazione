@@ -2,7 +2,7 @@
 
 
 import psycopg2
-
+import sys
 
 # Classe per l'indicizzazione di ogni tabella del db.
 # Si presuppone che il database sia locale, che si chiami 'GAvI', lo user che vi accede sia 'niko' e la sua pw sia 'nana'.
