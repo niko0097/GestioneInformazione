@@ -18,7 +18,6 @@ class phdthesis():
 		self.editor = []
 
 
-		##stringhe temporanee da buttare nel database
 		self.query = ""
 		self.autori = ""
 		self.ees = ""

@@ -4,13 +4,6 @@
 import psycopg2
 import sys
 
-# Classe per l'indicizzazione di ogni tabella del db.
-# Si presuppone che il database sia locale, che si chiami 'GAvI', lo user che vi accede sia 'niko' e la sua pw sia 'nana'.
-# Questa classe si occupa di indicizzare ogni tabella sui campi 'title', 'author', e 'year', per supportare la ricerca
-# su uno di questi 3 campi singolarmente, o su tutti e 3 assieme.
-# A seconda della tabella, è poi necessario indicizzare un altro campo (publisher o journal) per velocizzare le ricerche
-# della venue
-# Sono creati due indici: uno per la phrasal search, uno per la venue search
 class indexer:
     def __init__(self):
         self.tables = ['articles','book','incollection','inproceedings','mastersthesis','phdthesis','proceedings']
@@ -21,7 +14,6 @@ class indexer:
 
         self.conn = ''
 
-    # Funzione per la creazione dell'indice su ogni tabella
     def createColIndex(self):
         # Connessione con db
         print("Starting connection...")
@@ -29,7 +21,6 @@ class indexer:
         cur = conn.cursor()
         print("Connection established.")
 
-        # Su ogni tabella viene creata una colonna per ogni campo di ricerca. I dati all'interno sono tsvector
         for tab in self.tables:
             query = """
                     ALTER TABLE {0} ADD COLUMN ts_title tsvector;
@@ -72,7 +63,6 @@ class indexer:
                 conn.close()
                 return
 
-            # Creazione effettiva dell'indice (uno per venue search, uno per phrasal search)
             if tab in ['mastersthesis','phdthesis','inproceedings']:
                 query = """
                         CREATE INDEX {0}_idx ON {0}
@@ -110,7 +100,6 @@ class indexer:
         cur.close()
         conn.close()
 
-    # Funzione per l'eleiminazione dell'indice. Usare solo se assolutamente necessario.
     def deleteIdx(self):
         print("Starting connection...")
         conn = psycopg2.connect(host=self.host, database=self.db, user=self.user, password=self.pw)
@@ -156,8 +145,6 @@ class indexer:
 
 
 
-# Script per la creazione dell'indice da terminale. Se si lancia questo script si presuppone che si voglia creare
-# l'indice E BASTA
 if (sys.argv[1] == 'create'):
     ind = indexer()
     ind.createColIndex()

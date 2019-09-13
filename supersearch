@@ -114,7 +114,6 @@ class UserInterface:
 
     # PRINT RESULTS FROM THE QUERY, TREEVIEW AND JSON
     def print_view(self, records, string_label):
-        # TODO TRY IT OUT ON DIFFERENT MACHINE
         if self.tree.get_children():
             self.tree.destroy()
             self.tree = ttk.Treeview(self.tree_frame)
@@ -136,7 +135,6 @@ class UserInterface:
         i = 0
         for rec in records:
             try:
-                # NORMAL RECORD
                 if 'title' in rec.keys():
                     self.tree.insert('', 'end', iid=i, text=rec['title'])
                     if 'authors' in rec.keys():
@@ -145,7 +143,6 @@ class UserInterface:
                         self.tree.insert(i, 'end', text="Year: " + rec['year'])
                     if 'url' in rec.keys():
                         self.tree.insert(i, 'end', text="URL: " + rec['url'])
-                # INPROCEEDINGS --> PRINT INFO RELATIVE TO PROCEEDINGS TOO
                 elif 'i_title' in rec.keys():
                     self.tree.insert('', 'end', iid=i, text=rec['i_title'])
                     if 'i_authors' in rec.keys():

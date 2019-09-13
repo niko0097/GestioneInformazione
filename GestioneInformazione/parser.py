@@ -43,7 +43,6 @@ class DBLPHandler(xml.sax.ContentHandler):
 
 		self.school = ''
 
-		#contatori per self.currentdata aggiuntivo
 		self.sub_counter = 0
 		self.i_counter = 0
 		self.cite_counter = 0
@@ -51,13 +50,9 @@ class DBLPHandler(xml.sax.ContentHandler):
 		self.sup_counter = 0
 		self.space_counter = 0
 
-		#PostgreSql
-		#self.conn = psycopg2.connect(host="localhost",database="gavi_final", user="niko", password="nana") #latest
 		self.conn = psycopg2.connect(host="localhost",database="GAvI", user="niko", password="nana")
-		#conn = psycopg2.connect(host="localhost",database="parseeeeeeeer", user="gabbi", password="boris")
 		self.c = self.conn.cursor()
 
-		#Durata
 		self.start = ''
 		self.finish = ''
 
@@ -80,18 +75,11 @@ class DBLPHandler(xml.sax.ContentHandler):
 			x = mastersthesis.mastersthesis()
 			x.key = attr['key']
 			x.mdate = attr['mdate']
-			#print("mastersthesis")
-
-		#elif tag == 'www':
-		#	x = www()
-		#	x.key = attr['key']
-		#	x.mdate = attr['mdate']
 
 		elif tag == 'phdthesis':
 			x = phdthesis.phdthesis()
 			x.key = attr['key']
 			x.mdate = attr['mdate']
-			#print("phdthesis")
 
 		elif tag == 'proceedings':
 			x = proceedings.proceedings()
@@ -110,7 +98,7 @@ class DBLPHandler(xml.sax.ContentHandler):
 
 
 	'''Chiamato alla fine di un articolo.'''
-	def endElement(self, tag):					#PER L'AMOR DI DIO NON CAMBIARE STA PARTE CHE FUNZIONA NON SO PERCHE'
+	def endElement(self, tag):
 		global x
 		if tag == "author":
 			x.authors.append(self.author)
@@ -196,7 +184,7 @@ class DBLPHandler(xml.sax.ContentHandler):
 		self.CurrentData = ""
 
 	'''Lettura di un articolo.'''
-	def characters(self, content):				#NON CAMBIARE STA PARTE (funziona non so perche')
+	def characters(self, content):
 		global x
 		content = correctStr(content)
 
@@ -280,7 +268,6 @@ if __name__ == '__main__':
 		conn = psycopg2.connect(host="localhost",database="GAvI", user="niko", password="nana")
 		c = conn.cursor()
 
-		# CREO LE TABELLE #
 		x = article.article()
 		c.execute(x.table())
 
@@ -303,11 +290,8 @@ if __name__ == '__main__':
 		c.execute(x.table())
 
 		current = 0
-		# create an XMLReader
 		parser = xml.sax.make_parser()
-		# turn off namepsaces
 		parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-		# override the default ContextHandler
 		Handler = DBLPHandler()
 		parser.setContentHandler( Handler )
 		parser.parse("dblp.xml")

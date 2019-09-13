@@ -17,7 +17,6 @@ class proceedings():
 		self.pages = ''
 		self.crossref = ''				#14
 
-		##stringhe temporanee da buttare nel database
 		self.query = ""
 		self.ees = ""
 		self.editors = ""

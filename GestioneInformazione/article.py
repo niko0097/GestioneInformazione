@@ -17,7 +17,6 @@ class article():
 		self.crossref = ""			#13
 
 
-		##stringhe temporanee da buttare nel database
 		self.query = ""
 		self.autori = ""
 		self.ees = ""
@@ -28,7 +27,6 @@ class article():
 		self.editors = ' '.join(self.editor)
 		self.ees = ' '.join(self.ee)
 
-		#ridondante
 		'''self.autori = self.autori.replace("'", " ")
 		self.editors = self.editors.replace("'"," ")
 		self.ees = self.ees.replace("'", ' ')
@@ -37,7 +35,6 @@ class article():
 		'''
 
 		self.query = """INSERT INTO {} VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}' , '{}', '{}','{}');""".format(self.tipo, self.key, self.mdate, self.autori, self.title, self.pages, self.year, self.volume, self.journal, self.number, self.ees, self.editors, self.url, self.isbn,self.crossref)
-		#print(self.query)
 		return self.query
 
 	def table(self):

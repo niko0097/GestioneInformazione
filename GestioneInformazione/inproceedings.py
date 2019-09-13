@@ -14,7 +14,6 @@ class inproceedings:
 		self.editor = []			#11
 		self.isbn = ""				#12
 
-		##stringhe temporanee da buttare nel database
 		self.query = ""
 		self.autori = ""
 		self.ees = ""
